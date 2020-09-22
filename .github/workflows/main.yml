@@ -35,6 +35,7 @@ jobs:
     - name: Run a script
       run: |
         .\extra\build_win_installer.ps1
+        cd ..
         mv dist\Refl1D*.zip dist\Refl1D_latest.zip
       shell: powershell
     
