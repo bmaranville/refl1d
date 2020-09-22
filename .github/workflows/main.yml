@@ -33,19 +33,21 @@ jobs:
         python setup.py bdist_wheel
         
     - name: Run a script
-      run: .\extra\build_win_installer.ps1
+      run: |
+        .\extra\build_win_installer.ps1
+        mv dist\Refl1D*.zip dist\Refl1D_latest.zip
       shell: powershell
     
     - name: Archive production artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: dist
-        path: dist
+        name: Refl1D_latest.zip
+        path: dist\Refl1D_latest.zip
     - name: Update release
       uses: johnwbyrd/update-release@v1.0.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         release: unstable
         tag: sid
-        files: dist/*.zip
+        files: dist/Refl1D_latest.zip
      
