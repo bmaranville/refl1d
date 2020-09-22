@@ -49,5 +49,5 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         release: unstable
         tag: sid
-        files: dist/Refl1D_latest.zip
+        files: dist\Refl1D_latest.zip
      
