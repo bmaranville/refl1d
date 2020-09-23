@@ -44,7 +44,7 @@ Write-Host "Installing $APP_NAME-$APP_VERSION into embedded environment"
 # Add batch files for starting the application
 Copy-Item "$PSScriptRoot\*.bat" "build\$APP_PATH"
 Copy-Item "$PSScriptRoot\refl1d.ico" "build\$APP_PATH"
-Copy-Item "$PSScriptRoot\CreateShortcut.vbs" "build\$APP_PATH"
+Copy-Item "$PSScriptRoot\create_shortcut.bat" "build\$APP_PATH"
 
 # Create the embedded app archive in the dist directory .
 cd build
