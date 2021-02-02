@@ -52,7 +52,6 @@ jobs:
       if: matrix.config.exe == 1
       run: |
         pwsh -command ".\$GITHUB_WORKSPACE\extra\build_win_installer.ps1"
-        cd ..
         cp dist\Refl1D*.zip dist\Refl1D_latest.zip
 
     # See the following for how to upload to a release
