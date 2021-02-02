@@ -15,8 +15,8 @@ Refl1D Release Process
    # Note: linux boxen includes ~/dev as well as ~/src on the shared machines
 sh
 git status
-git pull
 git push
+git pull
 
 (2) check that all tests pass
   [bumps, refl1d, periodictable] X [windows, mac, linux] X [python 2.6, 2.7, 3.3, 3.4]
@@ -46,16 +46,7 @@ vi rtd-requirements
 git commit -a -m "R $REFLVER"
 git push
 
-(6) wait for the binaries for windows and mac
-
-# again, release is on jenkins, but this allows us to check the build
-# Note: don't use anaconda to build release version unless we update all
-# web pages to say "built with anaconda"; as convenient as it is, we don't
-# want to run afoul of license agreements by missing a page.
-#[windows, mac]
-#python master_builder.py
-
-(7) tag release
+(6) tag release
 
 git tag -a v$REFLVER -m "Refl1d $REFLVER"
 git push --tags # OR MAYBE: git push origin v$REFLVER
@@ -70,7 +61,7 @@ git push --tags -f
 # trigger the build on readthedocs (this should happen automatically now)
 https://readthedocs.org/builds/refl1d/
 
-(8) Build source distribution
+(7) Build source distribution
 
 python setup.py sdist
 
@@ -78,7 +69,9 @@ python setup.py sdist
 
 https://github.com/reflectometry/refl1d/releases/edit/vX.Y.Z
 
-Documentation: http://refl1d.readthedocs.org
+For windows, download [Refl1D-X.Y.Z-exe.zip](https://github.com/reflectometry/refl1d/releases/download/vX.Y.Z/Refl1D-X.Y.Z-exe.zip) and extract the archive. Go to the extracted directory and click on `refl1d_gui.bat`. This will open a dialog saying that the application is untrusted with a "Don't run" button at the bottom. Click on "more info" and a "Run anyway" button will appear.
+
+Use `pip install refl1d wxpython` to install Refl1D in your python environment.
 
 YYYY-M-DD vX.Y.Z
 ================
@@ -105,6 +98,7 @@ cd ..
 
 (10) update pypi with new release version
 
+ls dist/refl1d-$REFLVER*.whl dist/refl1d-$REFLVER.tar.gz
 twine upload dist/refl1d-$REFLVER*.whl dist/refl1d-$REFLVER.tar.gz
 
 (11) check that the new pypi version runs (single machine should be fine)

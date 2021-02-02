@@ -8,11 +8,14 @@ ROOT = os.path.abspath(os.path.dirname(__file__))
 CLI = "%s %s/bin/refl1d_cli.py %%s %%s"%(sys.executable, ROOT)
 EXAMPLEDIR = os.path.join(ROOT, 'doc', 'examples')
 
-# Add the build dir(s) to the system path
-from distutils.util import get_platform
-platform = '.%s-%s'%(get_platform(),sys.version[:3])
-buildpath = os.path.abspath(os.path.join(ROOT, 'build', 'lib'+platform))
-packages = [buildpath]
+# Add packages to the python path
+# Use in-place build of refl1d (requires "python setup.py build_ext --inplace")
+packages = [ROOT]
+## Add the build dir(s) to the system path
+##from distutils.util import get_platform
+##platform = '.%s-%s'%(get_platform(), sys.version[:3])
+##buildpath = os.path.abspath(os.path.join(ROOT, 'build', 'lib'+platform))
+##packages = [buildpath]
 try:
     import bumps
 except ImportError:
