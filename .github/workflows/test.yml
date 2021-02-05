@@ -52,7 +52,7 @@ jobs:
         MPLBACKEND: agg
 
     - name: Check that the docs build (linux only)
-      if: matrix.config.doc == 3
+      if: matrix.config.doc == 1
       run: |
         python -m pip install sphinx
         make -j 4 -C doc SPHINXOPTS="-W --keep-going" html
@@ -103,7 +103,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         release: unstable
         tag: sid
-        files: release\Refl1D_latest.zip
+        files: release/Refl1D_latest.zip
 
     - name: publish distribution to Test PyPI
       uses: pypa/gh-action-pypi-publish@master
