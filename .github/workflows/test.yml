@@ -93,7 +93,7 @@ jobs:
       with:
         name: artifacts
     
-    -name: show files
+    - name: show files
       run: |
         ls * -l
 
