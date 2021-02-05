@@ -46,7 +46,7 @@ jobs:
 
     - name: Build wheel
       run: |
-        python setup.py bdist_wheel
+        python setup.py bdist_wheel sdist
 
     - name: Build installer
       if: matrix.config.exe == 1
@@ -72,6 +72,12 @@ jobs:
         release: unstable
         tag: sid
         files: dist\Refl1D_latest.zip
+
+    - name: publish distribution to Test PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        repository_url: https://test.pypi.org/legacy/
 
     - name: Check that the docs build (linux only)
       if: matrix.config.doc == 1
