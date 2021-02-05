@@ -67,6 +67,7 @@ jobs:
           - { os: windows-latest, py: 3.8, exe: 1, whl: 1 }
           - { os: macos-latest, py: 3.8, whl: 1 }
 
+    steps:
     - name: Build binary wheel
       if: matrix.config.whl == 1
       run: |
@@ -104,6 +105,7 @@ jobs:
   publish:
     needs: build
     runs-on: ubuntu-latest
+    steps:
     - name: Retrieve all wheels
       uses: actions/download-artifact@v2
       with:
