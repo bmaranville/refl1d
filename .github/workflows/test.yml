@@ -69,8 +69,9 @@ jobs:
         mv dist\Refl1D*.zip release\Refl1D_latest.zip
 
     - name: Build source distribution
+      if: matrix.config.whl != 1
       run: |
-        python setup.py sdist
+        python setup.py sdist --formats=gztar,zip
 
     # See the following for how to upload to a release
     #  https://eugene-babichenko.github.io/blog/2020/05/09/github-actions-cross-platform-auto-releases/
