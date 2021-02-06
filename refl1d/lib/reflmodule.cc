@@ -12,7 +12,7 @@
   typedef unsigned long long uint64_t;
 #endif
 
-//#define Py_LIMITED_API 0x03020000
+#define Py_LIMITED_API 0x03020000
 #include <Python.h>
 
 #include "methods.h"
