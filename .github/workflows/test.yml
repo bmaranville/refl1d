@@ -61,7 +61,7 @@ jobs:
       if: matrix.config.whl == 1
       run: |
         python setup.py bdist_wheel --py-limited-api=cp32
-    
+
     - name: Build installer
       if: matrix.config.exe == 1
       run: |
@@ -93,7 +93,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: artifacts
-    
+
     - name: show files
       run: |
         ls * -l
