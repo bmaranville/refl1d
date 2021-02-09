@@ -32,6 +32,7 @@ jobs:
         python setup.py build_ext --inplace
         python setup.py build
         mkdir release
+        mkdir unstable
 
     - name: Run tests
       run: |
@@ -50,12 +51,14 @@ jobs:
       if: matrix.config.whl == 1
       run: |
         python setup.py bdist_wheel --py-limited-api=cp32
+        cp dist\*.whl unstable\refl1d-${{ matrix.config.os }}-cp32-abi3.whl
 
     - name: Build installer
       if: matrix.config.exe == 1
       run: |
         pwsh -command ".\$GITHUB_WORKSPACE\extra\build_win_installer.ps1"
-        mv dist\Refl1D*.zip release\Refl1D_latest.zip
+        cp dist\Refl1D*.zip unstable\Refl1D-windows-installer-latest.zip
+        mv dist\Refl1D*.zip release\
 
     - name: Build source distribution
       if: matrix.config.whl != 1
@@ -75,6 +78,7 @@ jobs:
           dist/*.zip
           dist/*.tar.gz
           release/*.zip
+          unstable/*.zip
 
   publish:
     needs: test_and_build
@@ -92,14 +96,16 @@ jobs:
         echo "SRC_DIST=$(ls dist/*.tar.gz)" >> $GITHUB_ENV
         echo "WINDOWS_WHL=$(ls dist/*win*.whl)" >> $GITHUB_ENV
         echo "MACOS_WHL=$(ls dist/*macos*.whl)" >> $GITHUB_ENV
+        echo "WINDOWS_LATEST_WHL=$(ls unstable/*win*.whl)" >> $GITHUB_ENV
+        echo "MACOS_LATEST_WHL=$(ls unstable/*macos*.whl)" >> $GITHUB_ENV
 
-    - name: Update release
+    - name: Update unstable release
       uses: johnwbyrd/update-release@v1.0.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         release: unstable
         tag: sid
-        files: ${{ env.SRC_DIST }} ${{ env.WINDOWS_WHL }} ${{ env.MACOS_WHL }} ${{ env.WINDOWS_INSTALLER }} 
+        files: unstable/Refl1D-windows-installer-latest.zip
           
     - name: publish distribution to Test PyPI
       uses: pypa/gh-action-pypi-publish@master
