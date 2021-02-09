@@ -78,7 +78,7 @@ jobs:
           dist/*.zip
           dist/*.tar.gz
           release/*.zip
-          unstable/*.zip
+          unstable/*
 
   publish:
     needs: test_and_build
