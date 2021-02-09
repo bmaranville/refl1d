@@ -99,11 +99,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         release: unstable
         tag: sid
-        files: |
-          release/Refl1D_latest.zip
-          ${SRC_DIST}
-          ${WINDOWS_WHL}
-          ${MACOS_WHL}
+        files: release/Refl1D_latest.zip $SRC_DIST $WINDOWS_WHL $MACOS_WHL
 
     - name: publish distribution to Test PyPI
       uses: pypa/gh-action-pypi-publish@master
