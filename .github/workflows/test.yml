@@ -108,7 +108,10 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         release: unstable
         tag: sid
-        files: unstable/Refl1D-windows-exe-latest.zip ${{ env.WINDOWS_LATEST_WHL }} ${{ env.MACOS_LATEST_WHL }}
+        body: |
+          For windows, download the file like "Refl1D-X.Y.Z-exe.zip" from the Assets below and extract the archive. Go to the extracted directory and click on `refl1d_gui.bat`. This will open a dialog saying that the application is untrusted with a "Don't run" button at the bottom. Click on "more info" and a "Run anyway" button will appear.
+          Use `pip install refl1d wxpython` to install Refl1D in your python environment.
+        files: unstable/Refl1D-windows-exe-latest.zip
     
     - name: Update current release
       if: startsWith(github.ref, 'refs/tags')
