@@ -51,7 +51,7 @@ jobs:
       if: matrix.config.whl == 1
       run: |
         python setup.py bdist_wheel --py-limited-api=cp32
-        cp dist\*.whl unstable\refl1d-${{ matrix.config.os }}-cp32-abi3.whl
+        cp dist/*.whl unstable/refl1d-${{ matrix.config.os }}-cp32-abi3.whl
 
     - name: Build installer
       if: matrix.config.exe == 1
