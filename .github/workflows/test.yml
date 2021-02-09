@@ -12,10 +12,10 @@ jobs:
     strategy:
       matrix:
         config:
-          #- { os: ubuntu-latest, py: 2.7 }
+          - { os: ubuntu-latest, py: 2.7 }
           - { os: ubuntu-latest, py: 3.8, doc: 0 }
-          #- { os: windows-latest, py: 3.8, exe: 1, whl: 1 }
-          #- { os: macos-10.14, py: 3.8, whl: 1 }
+          - { os: windows-latest, py: 3.8, exe: 1, whl: 1 }
+          - { os: macos-latest, py: 3.8, whl: 1 }
 
     steps:
     - uses: actions/checkout@v1
@@ -89,10 +89,10 @@ jobs:
     - name: show files
       run: |
         ls * -l
-        # echo "WINDOWS_INSTALLER=$(ls release/*.zip)" >> $GITHUB_ENV
+        echo "WINDOWS_INSTALLER=$(ls release/*.zip)" >> $GITHUB_ENV
         echo "SRC_DIST=$(ls dist/*.tar.gz)" >> $GITHUB_ENV
-        # echo "WINDOWS_WHL=$(ls dist/*win*.whl)" >> $GITHUB_ENV
-        # echo "MACOS_WHL=$(ls dist/*macos*.whl)" >> $GITHUB_ENV
+        echo "WINDOWS_WHL=$(ls dist/*win*.whl)" >> $GITHUB_ENV
+        echo "MACOS_WHL=$(ls dist/*macos*.whl)" >> $GITHUB_ENV
 
     - name: Update release
       uses: johnwbyrd/update-release@v1.0.0
@@ -100,7 +100,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         release: unstable
         tag: sid
-        files: ${{ env.SRC_DIST }} 
+        files: ${{ env.SRC_DIST }} ${{ env.WINDOWS_WHL }} ${{ env.MACOS_WHL }} ${{ env.WINDOWS_INSTALLER }} 
           
     - name: publish distribution to Test PyPI
       uses: pypa/gh-action-pypi-publish@master
