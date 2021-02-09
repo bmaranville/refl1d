@@ -89,16 +89,13 @@ jobs:
     - name: show files
       run: |
         ls * -l
+        # echo "WINDOWS_INSTALLER=$(ls release/*.zip)" >> $GITHUB_ENV
         echo "SRC_DIST=$(ls dist/*.tar.gz)" >> $GITHUB_ENV
-        echo "WINDOWS_WHL=$(ls dist/*win*.whl)" >> $GITHUB_ENV
-        echo "MACOS_WHL=$(ls dist/*macos*.whl)" >> $GITHUB_ENV
+        # echo "WINDOWS_WHL=$(ls dist/*win*.whl)" >> $GITHUB_ENV
+        # echo "MACOS_WHL=$(ls dist/*macos*.whl)" >> $GITHUB_ENV
 
     - name: Update release
       uses: johnwbyrd/update-release@v1.0.0
-      env:
-        SRC_DIST: refl1d-${{ env.version }}.tar.gz
-        WINDOWS_WHL: refl1d-${{ env.version }}-cp32-abi3-win_amd64.whl
-        MACOS_WHL: refl1d-${{ env.version }}-cp32-abi3-macosx_10_14_x86_64.whl
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         release: unstable
