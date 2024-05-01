@@ -53,7 +53,8 @@ jobs:
       run: |
         rm -rf dist
         npm run build_standalone
-        echo "DIST_SUBDIR=$(ls dist)" >> $GITHUB_ENV
+        DIST_SUBDIR=$(ls dist)
+        echo "DIST_SUBDIR=$DIST_SUBDIR" >> $GITHUB_ENV
         mkdir dist/$DIST_SUBDIR/assets/wheels
         cp ../../../../bumps/dist/*.whl dist/$DIST_SUBDIR/assets/wheels/
         cp ../../../../refl1d/dist/*.whl dist/$DIST_SUBDIR/assets/wheels/
