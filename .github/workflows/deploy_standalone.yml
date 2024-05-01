@@ -64,7 +64,7 @@ jobs:
     - name: Upload pages artifact client artifact
       uses: actions/upload-pages-artifact@v1.0.7
       with:
-        path: refl1d/refl1d/webview/client/dist/$DIST_SUBDIR
+        path: refl1d/refl1d/webview/client/dist/{{ env.DIST_SUBDIR }}
 
   # Deploy job
   deploy:
