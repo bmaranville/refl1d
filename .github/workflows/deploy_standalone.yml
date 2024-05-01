@@ -64,7 +64,7 @@ jobs:
          CI: ""
     
     - name: Upload pages artifact client artifact
-      uses: actions/upload-pages-artifact@v1.0.7
+      uses: actions/upload-pages-artifact@v3.0.1
       with:
         path: ${{ steps.build_client.outputs.deploy_path }}
 
@@ -88,4 +88,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
