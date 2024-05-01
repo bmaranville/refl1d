@@ -46,6 +46,7 @@ jobs:
         echo "BUMPS_PYTHON_WHL=$(ls dist)" >> $GITHUB_ENV
     - name: Build refl1d
       run: |
+        source "$CONDA_PREFIX/lib/python${{ matrix.python-version }}/site-packages/emsdk/emsdk_env.sh"
         cd refl1d
         BUILD_EXTENSION=True pyodide build
         echo "REFL1D_PYTHON_WHL=$(ls dist)" >> $GITHUB_ENV
