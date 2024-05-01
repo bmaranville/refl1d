@@ -49,12 +49,14 @@ jobs:
         npm link bumps-webview-client
       working-directory: refl1d/refl1d/webview/client
     - name: build client
+      id: build_client
       working-directory: refl1d/refl1d/webview/client
       run: |
         rm -rf dist
         npm run build_standalone
         DIST_SUBDIR=$(ls dist)
         echo "DIST_SUBDIR=$DIST_SUBDIR" >> $GITHUB_ENV
+        echo "deploy_path=$(pwd)/dist/$DIST_SUBDIR" >> $GITHUB_OUTPUT
         mkdir dist/$DIST_SUBDIR/assets/wheels
         cp ../../../../bumps/dist/*.whl dist/$DIST_SUBDIR/assets/wheels/
         cp ../../../../refl1d/dist/*.whl dist/$DIST_SUBDIR/assets/wheels/
@@ -64,7 +66,7 @@ jobs:
     - name: Upload pages artifact client artifact
       uses: actions/upload-pages-artifact@v1.0.7
       with:
-        path: refl1d/refl1d/webview/client/dist/{{ env.DIST_SUBDIR }}
+        path: ${{ steps.build_dist.outputs.deploy_path }}
 
   # Deploy job
   deploy:
