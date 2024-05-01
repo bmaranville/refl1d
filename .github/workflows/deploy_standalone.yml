@@ -9,6 +9,9 @@ jobs:
     # <Not provided for brevity>
     # At a minimum this job should upload artifacts using actions/upload-pages-artifact
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
 
     strategy:
       matrix:
@@ -21,10 +24,13 @@ jobs:
         auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         miniforge-variant: Mambaforge
+        activate-environment: pyodide
         use-mamba: true
     - name: Setup pyodide environment
       run: |
         mamba install -y emsdk pyodide-build
+        mamba list
+        echo $PATH
         PYODIDE_EMSCRIPTEN_VERSION=$(pyodide config get emscripten_version)
         emsdk install ${PYODIDE_EMSCRIPTEN_VERSION}
         emsdk activate ${PYODIDE_EMSCRIPTEN_VERSION}
