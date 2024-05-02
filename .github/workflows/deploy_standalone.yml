@@ -43,13 +43,15 @@ jobs:
       run: |
         cd bumps
         python setup.py bdist_wheel
-        echo "BUMPS_PYTHON_WHL=$(ls dist)" >> $GITHUB_ENV
+        echo "BUMPS_DIST=$(realpath dist)" >> $GITHUB_ENV
+        echo "BUMPS_WHEEL_FILE=$(ls dist)" >> $GITHUB_ENV
     - name: Build refl1d
       run: |
         source "$CONDA_PREFIX/lib/python${{ matrix.python-version }}/site-packages/emsdk/emsdk_env.sh"
         cd refl1d
         BUILD_EXTENSION=True pyodide build
-        echo "REFL1D_PYTHON_WHL=$(ls dist)" >> $GITHUB_ENV
+        echo "REFL1D_DIST=$(realpath dist)" >> $GITHUB_ENV
+        echo "REFL1D_WHEEL_FILE=$(ls dist)" >> $GITHUB_ENV
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
@@ -68,14 +70,12 @@ jobs:
       id: build_client
       working-directory: refl1d/refl1d/webview/client
       run: |
-        rm -rf dist
+        rm -rf dist_standalone
         npm run build_standalone
-        DIST_SUBDIR=$(ls dist)
-        echo "DIST_SUBDIR=$DIST_SUBDIR" >> $GITHUB_ENV
-        echo "deploy_path=$(pwd)/dist/$DIST_SUBDIR" >> $GITHUB_OUTPUT
-        mkdir dist/$DIST_SUBDIR/assets/wheels
-        cp ../../../../bumps/dist/*.whl dist/$DIST_SUBDIR/assets/wheels/
-        cp ../../../../refl1d/dist/*.whl dist/$DIST_SUBDIR/assets/wheels/
+        echo "deploy_path=$(realpath dist_standalone)" >> $GITHUB_OUTPUT
+        mkdir -p dist_standalone/assets/wheels
+        cp $BUMPS_DIST/$BUMPS_WHEEL_FILE dist_standalone/assets/wheels/
+        cp $REFL1D_DIST/$REFL1D_WHEEL_FILE dist_standalone/assets/wheels/
       env:
          CI: ""
     
