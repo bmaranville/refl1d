@@ -2,9 +2,11 @@ import { wrap, proxy } from 'comlink';
 import type { Endpoint, Remote } from 'comlink';
 // import './standalone_worker';
 import type { Server } from './standalone_worker';
+// import type { Server as FitServer } from './standalone_fit_worker';
 
 export function io() {
   const worker = new Worker(new URL("./standalone_worker.ts", import.meta.url), {type: 'module'});
+  // const fit_worker = new Worker(new URL("./standalone_fit_worker.ts", import.meta.url), {type: 'module'});
   const socket = new AsyncSocket(worker);
   return socket;
 };
@@ -15,15 +17,20 @@ export class AsyncSocket {
   proxy_lookups: Map<EventCallback, typeof proxy<EventCallback>>;
   handlers: { [signal: string]: EventCallback[] }
   ServerPromise: Promise<Remote<Server>>
+  // FitServerPromise: Promise<Remote<FitServer>>
   worker: Worker
+  // fit_worker: Worker
   id: string = "WebWorker"
 
   constructor(worker: Worker) {
     this.handlers = {};
     this.proxy_lookups = new Map();
     this.worker = worker;
+    // this.fit_worker = fit_worker;
     const ServerClass = wrap<Server>(worker);
+    // const FitServerClass = wrap<FitServer>(fit_worker);
     this.ServerPromise = new ServerClass();
+    // this.FitServerPromise = new FitServerClass();
   }
   connect() {}
   on(signal: string, handler: EventCallback) {
@@ -48,6 +55,7 @@ export class AsyncSocket {
     
     const server = await this.ServerPromise;
     await server.mount(dirHandle);
+    await server.asyncEmit('add_notification', {content: dirHandle.name, title: "Local Directory Mounted", timeout: 3000 });
     return true;
   }
   async syncFS() {
