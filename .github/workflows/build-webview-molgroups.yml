@@ -1,4 +1,4 @@
-name: Build webview with Jupyter
+name: Build webview with molgroups
 
 on:
   workflow_dispatch:
