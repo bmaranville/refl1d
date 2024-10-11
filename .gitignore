@@ -17,7 +17,7 @@ refl1d-webview-client*.tgz
 /dist/
 /refl1d.egg-info/
 /EGG-INFO
-/doc/_build/
+#/doc/_build/
 /doc/api/
 /doc/tutorial/
 /refl1d-*
