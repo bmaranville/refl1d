@@ -31,7 +31,7 @@ jobs:
         run: |
           cd ../../../bumps/bumps/webview/client
           bun link
-          cd ../../../refl1d/webview/client
+          cd ../../../../refl1d/webview/client
           bun link bumps
 
 
