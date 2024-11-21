@@ -28,7 +28,12 @@ jobs:
         run: bun install
 
       - name: Use bumps code from source
-        run: bun link ../../../bumps/bumps/webview/client
+        run: |
+          cd ../../../bumps/bumps/webview/client
+          bun link
+          cd ../../../refl1d/webview/client
+          bun link bumps
+
 
       - name: Run test
         run: bun run build
