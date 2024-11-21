@@ -30,6 +30,7 @@ jobs:
       - name: Use bumps code from source
         run: |
           cd ../../../bumps/bumps/webview/client
+          bun install
           bun link
           cd ../../../../refl1d/webview/client
           bun link bumps-webview-client
