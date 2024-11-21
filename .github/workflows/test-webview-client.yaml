@@ -32,7 +32,7 @@ jobs:
           cd ../../../bumps/bumps/webview/client
           bun link
           cd ../../../../refl1d/webview/client
-          bun link bumps
+          bun link bumps-webview-client
 
 
       - name: Run test
