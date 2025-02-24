@@ -1,0 +1,16 @@
+name: refl1d-binder
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - matplotlib
+  - numba
+  - numpy
+  - scipy
+  - orsopy
+  - gfortran
+
+  # Pip packages specified directly
+  - pip:
+    - bumps>=1.0.0a12
+    - periodictable
