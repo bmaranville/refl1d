@@ -6,6 +6,7 @@ Reflectometry backend loader
 import importlib
 
 from . import BACKEND_NAME, BACKEND_NAMES
+from .lib import CalculationBackend
 
 BACKEND_MODULE_NAMES = {
     "c_ext": "refl1d.reflmodule",
@@ -13,7 +14,7 @@ BACKEND_MODULE_NAMES = {
     "python": "refl1d.lib.python",
 }
 
-backend = None
+backend: CalculationBackend = None
 
 
 def set_backend(backend_name: BACKEND_NAMES):
