@@ -2,6 +2,7 @@
 import sys
 import os
 from setuptools import setup, Extension
+import numpy
 
 BUILD_EXTENSION = bool(os.environ.get("BUILD_EXTENSION", False)) or "build_ext" in sys.argv
 
@@ -17,6 +18,7 @@ def reflmodule_config():
         "convolve.cc",
         "convolve_sampled.cc",
         "build_profile.cc",
+        "autosample.cc",
     )
 
     Sdeps = ("erf.cc", "methods.h", "rebin.h", "rebin2D.h", "reflcalc.h")
@@ -26,6 +28,7 @@ def reflmodule_config():
         "refl1d.reflmodule",
         sources=sources,
         depends=depends,
+        include_dirs=[numpy.get_include()],
         language="c++",
     )
 
