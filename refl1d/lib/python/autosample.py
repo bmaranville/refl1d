@@ -41,7 +41,7 @@ def oversample_inplace(kz, dR, tol, w, rho, irho, sigma, max_sampling_iterations
     new_kz = kz
     rho_index = np.zeros(kz.shape, int32)
     r = np.empty_like(kz, dtype=complex128)
-    reflectivity_amplitude(w, sigma, rho, irho, -new_kz, rho_index, r)
+    reflectivity_amplitude(w, sigma, rho, irho, new_kz, rho_index, r)
     R = (r * np.conj(r)).real
     mapped_dR = dR
     out_of_tolerance = 1
@@ -98,7 +98,7 @@ def oversample_inplace(kz, dR, tol, w, rho, irho, sigma, max_sampling_iterations
 
         new_r = np.empty_like(new_kz_vals, dtype=complex128)
         new_rho_index = np.zeros(new_kz_vals.shape, int32)
-        reflectivity_amplitude(w, sigma, rho, irho, -new_kz_vals, new_rho_index, new_r)
+        reflectivity_amplitude(w, sigma, rho, irho, new_kz_vals, new_rho_index, new_r)
         new_R = (new_r * np.conj(new_r)).real
 
         new_kz = insert(new_kz, to_split + 1, new_kz_vals)
@@ -127,14 +127,16 @@ def apply_autosampling(model, tolerance=0.05):
     return new_kz, out_of_tol, r, dR
 
 
-def autosampled_reflectivity_amplitude(depth, sigma, rho, irho, kz, rho_index, dR, tolerance=0.05):
+def autosampled_reflectivity_amplitude(
+    depth, sigma, rho, irho, kz, rho_index, dR, dQ, tolerance=0.05, max_iterations=100
+):
     if dR is None:
         dR = np.full_like(kz, 0.01)
 
     if len(dR) != len(kz):
-        raise ValueError("len(dR) != len(kz)")
+        raise ValueError(f"len(dR) != len(kz) ({len(dR)} != {len(kz)})")
 
-    calc_kz, out_of_tol, r, dR = oversample_inplace(kz, dR, tolerance, depth, rho, irho, sigma)
+    calc_kz, out_of_tol, r, dR = oversample_inplace(kz, dR, tolerance, depth, rho, irho, sigma, max_iterations)
     return calc_kz, r
 
 
