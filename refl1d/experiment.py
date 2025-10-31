@@ -528,26 +528,22 @@ class Experiment(ExperimentBase):
                         sigma=sigma,
                     )
             else:
+                # Non-magnetic case
                 if autosample:
-                    # extend calc_q to cover the edges + 3*probe.dQ
-                    Q = self.probe.Q
-                    dQ = self.probe.dQ
                     intensity = float(self.probe.intensity) if hasattr(self.probe, "intensity") else 1.0
-                    calc_kz = np.hstack(
-                        (
-                            Q[0] / 2.0 - 3.0 * dQ[0],
-                            Q / 2.0,
-                            Q[-1] / 2.0 + 3.0 * dQ[-1],
-                        )
-                    )
-                    dR = np.pad(self.probe.dR / intensity, (1, 1), mode="edge") if self.probe.dR is not None else None
                     calc_kz, calc_r = autosample_reflamp(
-                        calc_kz, depth=w, rho=rho, irho=irho, sigma=sigma, dR=dR, tolerance=tolerance
+                        -self.probe.Q / 2,
+                        depth=w,
+                        rho=rho,
+                        irho=irho,
+                        sigma=sigma,
+                        dR=self.probe.dR / intensity,
+                        dQ=self.probe.dQ,
+                        tolerance=tolerance,
                     )
-                    calc_q = 2 * calc_kz
-                    self.probe._calc_Q = calc_q
+                    calc_q = -2.0 * calc_kz
                 else:
-                    calc_r = reflamp(-calc_q / 2, depth=w, rho=rho, irho=irho, sigma=sigma, autosample=autosample)
+                    calc_r = reflamp(-calc_q / 2, depth=w, rho=rho, irho=irho, sigma=sigma)
             if False and np.isnan(calc_r).any():
                 print("w", w)
                 print("rho", rho)

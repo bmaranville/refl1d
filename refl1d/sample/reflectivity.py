@@ -11,6 +11,7 @@ of the magnetic scattering using an unpolarized beam.
 """
 
 from functools import reduce
+from unittest import result
 
 # __doc__ = "Fundamental reflectivity calculations"
 __author__ = "Paul Kienzle"
@@ -108,7 +109,6 @@ def reflectivity_amplitude(
     irho=0,
     sigma=0,
     rho_index=None,
-    autosample=False,
 ):
     r"""
     Calculate reflectivity amplitude $r(k_z)$ from slab model.
@@ -149,8 +149,6 @@ def reflectivity_amplitude(
     )
 
     r = np.empty(kz.shape, "D")
-    # print "amplitude", depth, rho, kz, rho_index
-    # print depth.shape, sigma.shape, rho.shape, irho.shape, kz.shape
     backend.reflectivity_amplitude(depth, sigma, rho, irho, kz, rho_index, r)
 
     return r
@@ -164,12 +162,25 @@ def autosample_reflectivity_amplitude(
     sigma=0,
     rho_index=None,
     dR=None,
+    dQ=None,
     tolerance=0.05,
 ):
     """
     Calculate reflectivity amplitude $r(k_z)$ from slab model.
     """
     from ..backends import backend
+
+    # Extend kz to cover edges + 3*dQ
+    # assume kz are sorted (either increasing or decreasing)
+    kz_direction = np.sign(kz[-1] - kz[0])
+    kz = np.hstack(
+        (
+            kz[0] - kz_direction * 3.0 * dQ[0] / 2.0,
+            kz,
+            kz[-1] + kz_direction * 3.0 * dQ[-1],
+        )
+    )
+    dR = np.pad(dR, (1, 1), mode="edge") if dR is not None else None
 
     kz, depth, rho, irho, sigma, rho_index = prepare_slabs(
         kz=kz,
@@ -181,7 +192,7 @@ def autosample_reflectivity_amplitude(
     )
 
     calc_kz, r = backend.autosampled_reflectivity_amplitude(
-        depth, sigma, rho, irho, kz, rho_index, dR, tolerance=tolerance
+        depth, sigma, rho, irho, kz, rho_index, dR, dQ, tolerance, 100
     )
 
     return calc_kz, r
