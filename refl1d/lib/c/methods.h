@@ -72,6 +72,8 @@
 //PyObject* pyvector(int n, double v[]);
 
 PyObject* Preflectivity_amplitude(PyObject*obj,PyObject*args);
+PyObject* Pautosampled_reflectivity_amplitude(PyObject*obj,PyObject*args);
+PyObject* Pautosampled_reflectivity_amplitude_numpy(PyObject*obj,PyObject*args);
 PyObject* Pmagnetic_amplitude(PyObject* obj, PyObject* args);
 PyObject* Pcalculate_u1_u3(PyObject* obj, PyObject* args);
 PyObject* Palign_magnetic(PyObject *obj, PyObject *args);

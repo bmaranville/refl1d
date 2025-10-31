@@ -14,6 +14,8 @@
 
 //#define Py_LIMITED_API 0x03020000
 #include <Python.h>
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include <numpy/arrayobject.h>
 
 #include "methods.h"
 #include "rebin.h"
@@ -79,6 +81,62 @@ PyObject* Prebin2d(PyObject *obj, PyObject *args)
       nxout-1,xout,nyout-1,yout,Iout);
   FREE_VECTORS();
   return Py_BuildValue("");
+}
+
+// NumPy array wrapper for autosampled_reflectivity_amplitude
+PyObject* Pautosampled_reflectivity_amplitude_numpy(PyObject *obj, PyObject *args)
+{
+  // Call the bytes-returning version
+  PyObject *bytes_result = Pautosampled_reflectivity_amplitude(obj, args);
+  if (!bytes_result) {
+    return NULL;
+  }
+  
+  // Unpack the tuple (final_points, kz_bytes, r_bytes)
+  int final_points;
+  PyObject *kz_bytes, *r_bytes;
+  if (!PyArg_ParseTuple(bytes_result, "iOO", &final_points, &kz_bytes, &r_bytes)) {
+    Py_DECREF(bytes_result);
+    return NULL;
+  }
+  
+  // Get pointers to the byte data
+  const char *kz_data = PyBytes_AsString(kz_bytes);
+  const char *r_data = PyBytes_AsString(r_bytes);
+  if (!kz_data || !r_data) {
+    Py_DECREF(bytes_result);
+    return NULL;
+  }
+  
+  // Create NumPy arrays from the data
+  npy_intp dims[1] = {final_points};
+  
+  PyObject *kz_array = PyArray_SimpleNewFromData(1, dims, NPY_DOUBLE, (void*)kz_data);
+  if (!kz_array) {
+    Py_DECREF(bytes_result);
+    return NULL;
+  }
+  
+  PyObject *r_array = PyArray_SimpleNewFromData(1, dims, NPY_CDOUBLE, (void*)r_data);
+  if (!r_array) {
+    Py_DECREF(bytes_result);
+    Py_DECREF(kz_array);
+    return NULL;
+  }
+  
+  // Set the base of the arrays to keep the bytes objects alive
+  PyArray_SetBaseObject((PyArrayObject*)kz_array, kz_bytes);
+  PyArray_SetBaseObject((PyArrayObject*)r_array, r_bytes);
+  
+  // Keep references to the individual bytes objects
+  Py_INCREF(kz_bytes);
+  Py_INCREF(r_bytes);
+  
+  // Clean up the tuple
+  Py_DECREF(bytes_result);
+  
+  // Return tuple of NumPy arrays
+  return Py_BuildValue("(OO)", kz_array, r_array);
 }
 
 static PyMethodDef methods[] = {
@@ -199,6 +257,18 @@ static PyMethodDef methods[] = {
 	 "rebin2d_float64(xi,yi,Ii,xo,yo,Io): 2-D rebin from (xi,yi) to (xo,yo)"
 	},
 
+	{"autosampled_reflectivity_amplitude",
+	 Pautosampled_reflectivity_amplitude_numpy,
+	 METH_VARARGS,
+	 "autosampled_reflectivity_amplitude(depth,sigma,rho,irho,initial_kz,rho_index,initial_dR,dQ,tolerance,max_iterations): compute reflectivity amplitude with adaptive oversampling and return (kz_array, r_array)"
+	},
+
+	{"autosampled_reflectivity_amplitude_bytes",
+	 Pautosampled_reflectivity_amplitude,
+	 METH_VARARGS,
+	 "autosampled_reflectivity_amplitude_bytes(depth,sigma,rho,irho,initial_kz,rho_index,initial_dR,dQ,tolerance,max_iterations): compute reflectivity amplitude with adaptive oversampling and return (final_points, kz_bytes, r_bytes)"
+	},
+
 	{0}
 } ;
 
@@ -232,19 +302,32 @@ static PyMethodDef methods[] = {
       NULL,                /* m_clear */
       NULL,                /* m_free */
     };
-    return PyModule_Create(&moduledef);
+    PyObject *module = PyModule_Create(&moduledef);
+    if (module == NULL) return NULL;
+    
+    /* Initialize NumPy */
+    if (_import_array() < 0) {
+        Py_DECREF(module);
+        return NULL;
+    }
+    
+    return module;
   }
 
 #else /* PY_MAJOR_VERSION >= 3 */
 
   DLL_EXPORT PyMODINIT_FUNC MODULE_INIT2(void)
   {
-    Py_InitModule4(MODULE_NAME,
+    PyObject *module = Py_InitModule4(MODULE_NAME,
 		 MODULE_METHODS,
 		 MODULE_DOC,
 		 0,
 		 PYTHON_API_VERSION
 		 );
+    if (module == NULL) return;
+    
+    /* Initialize NumPy */
+    if (_import_array() < 0) return;
   }
 
 #endif /* PY_MAJOR_VERSION >= 3 */

@@ -3,6 +3,10 @@
 #ifndef _REFLCALC_H
 #define _REFLCALC_H
 
+#include <vector>
+#include <utility>
+#include <complex>
+
 /*
 
 
@@ -174,6 +178,69 @@ build_profile(size_t NZ, size_t NP, size_t NI,
               const double initial_value[], /* length NP */
               double profile[] /* length NP * NZ (num profiles * num z) */
               );
+
+// New oversample_inplace that returns vectors
+std::pair<std::vector<double>, std::vector<Cplx>>
+oversample_inplace(const int initial_points,
+                   const double initial_kz[],
+                   const double initial_dR[],
+                   const double tolerance,
+                   const int layers,
+                   const double depth[],
+                   const double sigma[],
+                   const double rho[],
+                   const double irho[],
+                   const int max_sampling_iterations);
+
+// Backward-compatible legacy wrapper
+void
+oversample_inplace_legacy(const int initial_points,
+                          const double initial_kz[],
+                          const double initial_dR[],
+                          const double tolerance,
+                          const int layers,
+                          const double depth[],
+                          const double sigma[],
+                          const double rho[],
+                          const double irho[],
+                          const int max_sampling_iterations,
+                          int* final_points,
+                          double final_kz[],
+                          Cplx final_r[],
+                          double final_dR[]);
+
+// New autosampled_reflectivity_amplitude that returns vectors
+std::pair<std::vector<double>, std::vector<Cplx>>
+autosampled_reflectivity_amplitude(const int layers,
+                                   const double depth[],
+                                   const double sigma[], 
+                                   const double rho[],
+                                   const double irho[],
+                                   const int initial_points,
+                                   const double initial_kz[],
+                                   const int rho_index[],
+                                   const double initial_dR[],
+                                   const double dQ[],
+                                   const double tolerance,
+                                   const int max_sampling_iterations);
+
+// Backward-compatible legacy wrapper
+void
+autosampled_reflectivity_amplitude_legacy(const int layers,
+                                          const double depth[],
+                                          const double sigma[], 
+                                          const double rho[],
+                                          const double irho[],
+                                          const int initial_points,
+                                          const double initial_kz[],
+                                          const int rho_index[],
+                                          const double initial_dR[],
+                                          const double dQ[],
+                                          const double tolerance,
+                                          const int max_sampling_iterations,
+                                          int* final_points,
+                                          double final_kz[],
+                                          Cplx final_r[]);
 
 #ifdef __cplusplus
 }

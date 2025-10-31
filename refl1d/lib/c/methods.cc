@@ -3,13 +3,13 @@
 #include <math.h>
 #include <stdio.h>
 #include <iostream>
+#include <cstring>
 
 //#define Py_LIMITED_API 0x03020000
 #include <Python.h>
 
 #include "reflcalc.h"
 #include "methods.h"
-
 
 #if defined(PY_VERSION_HEX) &&  (PY_VERSION_HEX < 0x02050000)
 typedef int Py_ssize_t;
@@ -167,6 +167,128 @@ PyObject* Preflectivity_amplitude(PyObject*obj,PyObject*args)
   reflectivity_amplitude((int)nd, d, sigma, rho, irho, (int)nkz, kz, rho_index, r);
   FREE_VECTORS();
   return Py_BuildValue("");
+}
+
+PyObject* Pautosampled_reflectivity_amplitude(PyObject*obj,PyObject*args)
+{
+  PyObject *depth_obj, *sigma_obj, *rho_obj, *irho_obj;
+  PyObject *initial_kz_obj, *rho_index_obj, *initial_dR_obj, *dQ_obj;
+  
+  Py_ssize_t nlayers, nsigma, nrho, nirho;
+  Py_ssize_t ninitial_kz, nrho_index, ninitial_dR, ndQ;
+  
+  const double *depth, *sigma, *rho, *irho;
+  const double *initial_kz, *initial_dR, *dQ;
+  const int *rho_index;
+  
+  double tolerance;
+  int max_sampling_iterations;
+  
+  DECLARE_VECTORS(8);
+
+  if (!PyArg_ParseTuple(args, "OOOOOOOOdi:autosampled_reflectivity_amplitude",
+      &depth_obj, &sigma_obj, &rho_obj, &irho_obj,
+      &initial_kz_obj, &rho_index_obj, &initial_dR_obj, &dQ_obj,
+      &tolerance, &max_sampling_iterations))
+    return NULL;
+    
+  INVECTOR(depth_obj, depth, nlayers);
+  INVECTOR(sigma_obj, sigma, nsigma);
+  INVECTOR(rho_obj, rho, nrho);
+  INVECTOR(irho_obj, irho, nirho);
+  INVECTOR(initial_kz_obj, initial_kz, ninitial_kz);
+  INVECTOR(rho_index_obj, rho_index, nrho_index);
+  INVECTOR(dQ_obj, dQ, ndQ);
+  
+  // Handle optional dR parameter
+  if (initial_dR_obj != Py_None) {
+    INVECTOR(initial_dR_obj, initial_dR, ninitial_dR);
+    if (ninitial_dR != ninitial_kz) {
+#ifndef BROKEN_EXCEPTIONS
+      PyErr_SetString(PyExc_ValueError, "initial_dR and initial_kz must have the same length");
+#endif
+      FREE_VECTORS();
+      return NULL;
+    }
+  } else {
+    initial_dR = NULL;
+    ninitial_dR = 0;
+  }
+  
+  // Validate input dimensions
+  if (nlayers != nrho || nlayers != nirho || nsigma != nlayers - 1) {
+#ifndef BROKEN_EXCEPTIONS
+    PyErr_SetString(PyExc_ValueError, "depth, rho, irho must have same length; sigma must be one shorter");
+#endif
+    FREE_VECTORS();
+    return NULL;
+  }
+  
+  if (ninitial_kz != nrho_index) {
+#ifndef BROKEN_EXCEPTIONS
+    PyErr_SetString(PyExc_ValueError, "initial_kz and rho_index must have the same length");
+#endif
+    FREE_VECTORS();
+    return NULL;
+  }
+  
+  // Call the C function (returns vectors directly)
+  auto result = autosampled_reflectivity_amplitude(
+    (int)nlayers, depth, sigma, rho, irho,
+    (int)ninitial_kz, initial_kz, rho_index, initial_dR, dQ,
+    tolerance, max_sampling_iterations
+  );
+  
+  FREE_VECTORS();
+  
+  // Get result sizes
+  int final_points = result.first.size();
+  
+  // Safety check
+  if (final_points == 0) {
+#ifndef BROKEN_EXCEPTIONS
+    PyErr_SetString(PyExc_RuntimeError, "C function returned empty vectors");
+#endif
+    return NULL;
+  }
+  
+  // Allocate and copy vector data to ensure it persists
+  double* kz_data = (double*)malloc(final_points * sizeof(double));
+  Cplx* r_data = (Cplx*)malloc(final_points * sizeof(Cplx));
+  
+  if (!kz_data || !r_data) {
+    free(kz_data);
+    free(r_data);
+    return PyErr_NoMemory();
+  }
+  
+  // Copy data from vectors
+  memcpy(kz_data, result.first.data(), final_points * sizeof(double));
+  memcpy(r_data, result.second.data(), final_points * sizeof(Cplx));
+  
+  // Create bytes objects from copied data
+  PyObject* kz_bytes = PyBytes_FromStringAndSize(
+    (const char*)kz_data,
+    final_points * sizeof(double)
+  );
+  
+  PyObject* r_bytes = PyBytes_FromStringAndSize(
+    (const char*)r_data,
+    final_points * sizeof(Cplx)
+  );
+  
+  // Free our temporary allocations
+  free(kz_data);
+  free(r_data);
+  
+  if (!kz_bytes || !r_bytes) {
+    Py_XDECREF(kz_bytes);
+    Py_XDECREF(r_bytes);
+    return PyErr_NoMemory();
+  }
+  
+  // Return tuple of (final_points, kz_bytes, r_bytes)
+  return Py_BuildValue("(iOO)", final_points, kz_bytes, r_bytes);
 }
 
 PyObject* Palign_magnetic(PyObject *obj, PyObject *args)
