@@ -11,6 +11,7 @@ BACKEND_MODULE_NAMES = {
     "c_ext": "refl1d.reflmodule",
     "numba": "refl1d.lib.numba",
     "python": "refl1d.lib.python",
+    "jax": "refl1d.lib.jax",
 }
 
 backend = None
